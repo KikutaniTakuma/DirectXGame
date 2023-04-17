@@ -8,6 +8,10 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include <memory>
+#include "ImGuiManager.h"
+#include <array>
+#include "DebugCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -48,4 +52,23 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	uint32_t textureHandle_;
+
+	std::unique_ptr<Sprite> sprite_;
+
+	std::unique_ptr<Model> model;
+
+	// ワールドトランスフォーム
+	WorldTransform worldTransform_;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+
+	uint32_t soundDataHandle_;
+
+	uint32_t voiceHandle_;
+
+	std::array<float, 3> inputFloat3;
+
+	// デバックカメラ
+	std::unique_ptr<DebugCamera> debugCamera_;
 };
