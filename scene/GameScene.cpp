@@ -2,7 +2,9 @@
 #include "TextureManager.h"
 #include <cassert>
 
-GameScene::GameScene() {}
+GameScene::GameScene() :
+	textureHandle_(0u)
+{}
 
 GameScene::~GameScene() {}
 
@@ -11,9 +13,23 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	textureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
+
+	model_ .reset(Model::Create());
+	modelObserver = model_;
+
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
+
+	player_ = std::make_unique<Player>();
+
+	player_->Initialize(model_, textureHandle_);
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	player_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -41,6 +57,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	player_->Draw(viewProjection_);
+
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
