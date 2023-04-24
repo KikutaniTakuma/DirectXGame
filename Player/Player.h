@@ -3,6 +3,7 @@
 #include "WorldTransform.h"
 #include "Model.h"
 #include <memory>
+#include <Input.h>
 
 class Player {
 public:
@@ -20,4 +21,5 @@ private:
 
 	WorldTransform worldTransform_;
 
+	Input* input_ = nullptr;
 };

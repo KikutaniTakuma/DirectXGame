@@ -9,6 +9,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <memory>
+#include "DebugCamera.h"
 
 #include "Player/Player.h"
 
@@ -62,6 +63,10 @@ private:
 
 	ViewProjection viewProjection_;
 
-
 	std::unique_ptr<Player> player_;
+
+	std::unique_ptr<DebugCamera> debugCamera_;
+
+	// debugCamera有効化フラグ
+	bool isDebugCameraActive_ = false;
 };

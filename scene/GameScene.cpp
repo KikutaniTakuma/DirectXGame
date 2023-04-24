@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include "AxisIndicator.h"
 
 GameScene::GameScene() :
 	textureHandle_(0u)
@@ -25,10 +26,38 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 
 	player_->Initialize(model_, textureHandle_);
+
+	debugCamera_ = std::make_unique<DebugCamera>(1280,720);
 }
 
 void GameScene::Update() {
+#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_F3)) {
+		if (!isDebugCameraActive_) {
+			isDebugCameraActive_ = true;
+			AxisIndicator::GetInstance()->SetVisible(true);
+		}
+		else if (isDebugCameraActive_) {
+			isDebugCameraActive_ = false;
+			AxisIndicator::GetInstance()->SetVisible(false);
+		}
+	}
+
+#endif
+
 	player_->Update();
+
+	if (debugCamera_) {
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+
+		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+	}
+	else {
+		viewProjection_.UpdateMatrix();
+	}
 }
 
 void GameScene::Draw() {
