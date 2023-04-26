@@ -3,18 +3,15 @@
 #include "WorldTransform.h"
 #include "Model.h"
 #include <memory>
-#include <Input.h>
-#include "Bullet/Bullet.h"
-#include <list>
 
-class Player {
+class Bullet
+{
 public:
-	void Initialize(std::shared_ptr<Model> model, uint32_t textureHandle);
+	void Initialize(std::shared_ptr<Model> model, Vector3 pos);
 
 	void Update();
 
 	void Draw(ViewProjection& viewProjection);
-
 
 private:
 	uint32_t textureHandle_;
@@ -23,7 +20,8 @@ private:
 
 	WorldTransform worldTransform_;
 
-	Input* input_ = nullptr;
-
-	std::list<std::unique_ptr<Bullet>> bullets;
+public:
+	inline Vector3 getPos() const {
+		return worldTransform_.translation_;
+	}
 };
