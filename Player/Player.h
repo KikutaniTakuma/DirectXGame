@@ -15,6 +15,8 @@ public:
 
 	void Draw(ViewProjection& viewProjection);
 
+private:
+	void Attack();
 
 private:
 	uint32_t textureHandle_;

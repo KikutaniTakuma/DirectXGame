@@ -32,32 +32,7 @@ void Player::Update() {
 		move.y -= kPlayerSpeed;
 	}
 
-	if (input_->TriggerKey(DIK_SPACE)) {
-		bullets.push_back(std::make_unique<Bullet>());
-		(*(--bullets.end()))->Initialize(model_, worldTransform_.translation_);
-	}
-
-
-	for (auto bullet = bullets.begin(); bullet != bullets.end(); bullet++) {
-		(*bullet)->Update();
-		if ((*bullet)->getPos().z >= 50.0f) {
-			auto tmp = bullet;
-			if (tmp == bullets.begin()) {
-				tmp->reset();
-				bullets.erase(tmp);
-				bullet = bullets.begin();
-				if (bullets.empty()) {
-					break;
-				}
-				continue;
-			}
-			else {
-				bullet--;
-			}
-			tmp->reset();
-			bullets.erase(tmp);
-		}
-	}
+	Attack();
 
 	const float kMoveLimitX = 34.0f;
 	const float kMoveLimitY = 19.0f;
@@ -81,5 +56,34 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 	for (auto& bullet : bullets) {
 		bullet->Draw(viewProjection);
+	}
+}
+
+void Player::Attack() {
+	if (input_->TriggerKey(DIK_SPACE)) {
+		bullets.push_back(std::make_unique<Bullet>());
+		(*(bullets.rbegin()))->Initialize(model_, worldTransform_.translation_);
+	}
+
+
+	for (auto bullet = bullets.begin(); bullet != bullets.end(); bullet++) {
+		(*bullet)->Update();
+		if ((*bullet)->getPos().z >= 50.0f) {
+			auto tmp = bullet;
+			if (tmp == bullets.begin()) {
+				tmp->reset();
+				bullets.erase(tmp);
+				bullet = bullets.begin();
+				if (bullets.empty()) {
+					break;
+				}
+				continue;
+			}
+			else {
+				bullet--;
+			}
+			tmp->reset();
+			bullets.erase(tmp);
+		}
 	}
 }
