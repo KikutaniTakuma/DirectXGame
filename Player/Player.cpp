@@ -62,7 +62,7 @@ void Player::Draw(ViewProjection& viewProjection) {
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		bullets.push_back(std::make_unique<Bullet>());
-		(*(bullets.rbegin()))->Initialize(model_, worldTransform_.translation_);
+		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_);
 	}
 
 
