@@ -6,7 +6,7 @@
 void Bullet::Initialize(std::shared_ptr<Model> model, Vector3 pos) {
 	assert(model);
 
-	textureHandle_ = TextureManager::Load("./Resources/Poop.png");
+	textureHandle_ = TextureManager::Load("./Resources/Bullet.png");
 	model_ = model;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
