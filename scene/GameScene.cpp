@@ -17,7 +17,7 @@ void GameScene::Initialize() {
 
 	playerTextureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
 
-	enemyTextureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
+	enemyTextureHandle_ = TextureManager::Load("./Resources/Enemy.png");
 
 	model_ .reset(Model::Create());
 	modelObserver = model_;
