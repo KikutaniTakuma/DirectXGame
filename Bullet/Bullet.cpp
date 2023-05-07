@@ -8,7 +8,7 @@ const std::chrono::milliseconds Bullet::kLifeTime = std::chrono::milliseconds(50
 void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity) {
 	assert(model);
 
-	textureHandle_ = TextureManager::Load("./Resources/Poop.png");
+	textureHandle_ = TextureManager::Load("./Resources/Bullet.png");
 	model_ = model;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
