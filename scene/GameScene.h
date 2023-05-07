@@ -12,6 +12,7 @@
 #include "DebugCamera.h"
 
 #include "Player/Player.h"
+#include "Enemy/Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -53,7 +54,9 @@ private:
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	uint32_t textureHandle_;
+	uint32_t playerTextureHandle_;
+
+	uint32_t enemyTextureHandle_;
 
 	std::shared_ptr<Model> model_;
 
@@ -64,6 +67,8 @@ private:
 	ViewProjection viewProjection_;
 
 	std::unique_ptr<Player> player_;
+
+	std::unique_ptr<Enemy> enemy_;
 
 	std::unique_ptr<DebugCamera> debugCamera_;
 

@@ -4,7 +4,7 @@
 #include "AxisIndicator.h"
 
 GameScene::GameScene() :
-	textureHandle_(0u)
+	playerTextureHandle_(0u)
 {}
 
 GameScene::~GameScene() {}
@@ -15,7 +15,9 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	textureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
+	playerTextureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
+
+	enemyTextureHandle_ = TextureManager::Load("./Resources/chocoIceCream.png");
 
 	model_ .reset(Model::Create());
 	modelObserver = model_;
@@ -25,7 +27,11 @@ void GameScene::Initialize() {
 
 	player_ = std::make_unique<Player>();
 
-	player_->Initialize(model_, textureHandle_);
+	player_->Initialize(model_, playerTextureHandle_);
+
+	enemy_ = std::make_unique<Enemy>();
+
+	enemy_->Initialize(model_, enemyTextureHandle_);
 
 	debugCamera_ = std::make_unique<DebugCamera>(1280,720);
 }
@@ -46,6 +52,8 @@ void GameScene::Update() {
 #endif
 
 	player_->Update();
+
+	enemy_->Update();
 
 	if (debugCamera_) {
 		debugCamera_->Update();
@@ -87,6 +95,8 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection_);
+
+	enemy_->Draw(viewProjection_);
 
 
 	// 3Dオブジェクト描画後処理
