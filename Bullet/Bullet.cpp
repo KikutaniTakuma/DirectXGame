@@ -3,29 +3,40 @@
 #include <algorithm>
 #include "Vector3.h"
 
-void Bullet::Initialize(std::shared_ptr<Model> model, Vector3 pos) {
+const std::chrono::milliseconds Bullet::kLifeTime = std::chrono::milliseconds(5000);
+
+void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity) {
 	assert(model);
 
 	textureHandle_ = TextureManager::Load("./Resources/Poop.png");
 	model_ = model;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = pos;
+	velocity_ = velocity;
+
+	isDead_ = false;
+	start_ = std::chrono::steady_clock::now();
 }
 
 void Bullet::Update() {
-	Vector3 move = { 0.0f,0.0f,0.0f };
+	auto end = std::chrono::steady_clock::now();
 
-	const float kBulletSpeed = 0.5f;
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime) {
+		isDead_ = true;
+	}
 
-	move.z = kBulletSpeed;
+	if (!isDead_) {
+		worldTransform_.translation_ += velocity_;
 
-	worldTransform_.translation_ += move;
+		worldTransform_.matWorld_ =
+		    MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), worldTransform_.translation_);
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), worldTransform_.translation_);
-
-	worldTransform_.TransferMatrix();
+		worldTransform_.TransferMatrix();
+	}
 }
 
 void Bullet::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (!isDead_) {
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	}
 }

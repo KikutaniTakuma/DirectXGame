@@ -32,8 +32,6 @@ void Player::Update() {
 		move.y -= kPlayerSpeed;
 	}
 
-	Attack();
-
 	const float kMoveLimitX = 34.0f;
 	const float kMoveLimitY = 19.0f;
 
@@ -43,6 +41,8 @@ void Player::Update() {
 	worldTransform_.translation_.y = std::clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
 
 	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), worldTransform_.translation_);
+
+	Attack();
 
 	worldTransform_.TransferMatrix();
 
@@ -62,28 +62,21 @@ void Player::Draw(ViewProjection& viewProjection) {
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		bullets.push_back(std::make_unique<Bullet>());
-		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_);
+
+		const float kBulletSpd = 1.0f;
+		Vector3 velocity(0.0f, 0.0f, kBulletSpd);
+
+		velocity *= MakeMatrixRotateY(worldTransform_.rotation_.z);
+
+		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity);
 	}
 
 
 	for (auto bullet = bullets.begin(); bullet != bullets.end(); bullet++) {
 		(*bullet)->Update();
-		if ((*bullet)->getPos().z >= 50.0f) {
-			auto tmp = bullet;
-			if (tmp == bullets.begin()) {
-				tmp->reset();
-				bullets.erase(tmp);
-				bullet = bullets.begin();
-				if (bullets.empty()) {
-					break;
-				}
-				continue;
-			}
-			else {
-				bullet--;
-			}
-			tmp->reset();
-			bullets.erase(tmp);
-		}
 	}
+
+	bullets.remove_if([](const std::unique_ptr<Bullet>& bullet) { 
+		return bullet->getIsDead();
+	});
 }

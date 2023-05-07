@@ -68,7 +68,7 @@ Vector3 Vector3::operator*(const Matrix4x4& mat) {
 	return result;
 }
 
-Vector3& Vector3::operator=(const Matrix4x4& mat) {
+Vector3& Vector3::operator*=(const Matrix4x4& mat) {
 	*this = *this * mat;
 
 	return *this;

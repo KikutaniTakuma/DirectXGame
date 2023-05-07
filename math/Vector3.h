@@ -24,7 +24,7 @@ public:
 	Vector3 operator*=(float scalar);
 	Vector3 Normalize();
 	Vector3 operator*(const Matrix4x4& mat);
-	Vector3& operator=(const Matrix4x4& mat);
+	Vector3& operator*=(const Matrix4x4& mat);
 
 	float Dot(const Vector3& vec);
 	float Length();
