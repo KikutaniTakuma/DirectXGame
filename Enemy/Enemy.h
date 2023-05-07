@@ -8,6 +8,12 @@
 #include <list>
 
 class Enemy {
+private:
+	enum class Phase {
+		Approch,
+		Leave
+	};
+
 public:
 	void Initialize(std::shared_ptr<Model> model, uint32_t textureHandle);
 
@@ -28,4 +34,6 @@ private:
 	Input* input_ = nullptr;
 
 	std::list<std::unique_ptr<Bullet>> bullets;
+
+	Phase phase_;
 };

@@ -1,8 +1,8 @@
-#include "ImGuiManager.h"
 #include "Enemy.h"
 #include <cassert>
 #include "Vector3.h"
 #include <algorithm>
+#include <numbers>
 
 void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	assert(model);
@@ -13,26 +13,44 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	input_ = Input::GetInstance();
 	bullets.resize(0);
 
-	worldTransform_.translation_.y = 10.0f;
+	phase_ = Enemy::Phase::Approch;
+
+	worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_.z = 100.0f;
 }
 
 void Enemy::Update() {
 	Vector3 move = { 0.0f,0.0f,0.0f };
+	const float kEnemyApprochSpeed = 0.5f;
+	const float kEnemyLeaveSpeed = kEnemyApprochSpeed / std::numbers::sqrt2_v<float>;
 
-	const float kPlayerSpeed = 0.5f;
+	switch (phase_)
+	{
+	case Enemy::Phase::Approch:
+	default:
 
-	move.z = -kPlayerSpeed;
+		move.z = -kEnemyApprochSpeed;
 
-	worldTransform_.translation_ += move;
+		worldTransform_.translation_ += move;
+
+		if (worldTransform_.translation_.z < 0.0f) {
+			phase_ = Enemy::Phase::Leave;
+		}
+
+
+		break;
+	case Enemy::Phase::Leave:
+		move.z = -kEnemyLeaveSpeed;
+		move.x = -kEnemyLeaveSpeed;
+
+		worldTransform_.translation_ += move;
+
+		break;
+	}
 
 	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.TransferMatrix();
-
-	ImGui::Begin("Player Position");
-	ImGui::Text("x : %.02f, y : %.02f, z : %.02f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
-	ImGui::End();
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
