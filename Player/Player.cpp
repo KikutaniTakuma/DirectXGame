@@ -3,6 +3,7 @@
 #include <cassert>
 #include "Vector3.h"
 #include <algorithm>
+#include <numbers>
 
 void Player::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) { 
 	assert(model);
@@ -12,6 +13,8 @@ void Player::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	worldTransform_.Initialize();
 	input_ = Input::GetInstance();
 	bullets.resize(0);
+
+	rotateY_ = std::numbers::pi_v<float> / 60.0f;
 }
 
 void Player::Update() { 
@@ -32,6 +35,15 @@ void Player::Update() {
 		move.y -= kPlayerSpeed;
 	}
 
+	if (input_->PushKey(DIK_D)) {
+		worldTransform_.rotation_.y += rotateY_;
+	}
+	if (input_->PushKey(DIK_A)) {
+		worldTransform_.rotation_.y -= rotateY_;
+	}
+
+	Attack();
+
 	const float kMoveLimitX = 34.0f;
 	const float kMoveLimitY = 19.0f;
 
@@ -40,9 +52,7 @@ void Player::Update() {
 	worldTransform_.translation_.x = std::clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);
 	worldTransform_.translation_.y = std::clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), worldTransform_.translation_);
-
-	Attack();
+	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.TransferMatrix();
 
@@ -66,14 +76,14 @@ void Player::Attack() {
 		const float kBulletSpd = 1.0f;
 		Vector3 velocity(0.0f, 0.0f, kBulletSpd);
 
-		velocity *= MakeMatrixRotateY(worldTransform_.rotation_.z);
+		velocity *= MakeMatrixRotateY(worldTransform_.rotation_.y);
 
 		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity);
 	}
 
 
-	for (auto bullet = bullets.begin(); bullet != bullets.end(); bullet++) {
-		(*bullet)->Update();
+	for (auto& bullet : bullets) {
+		bullet->Update();
 	}
 
 	bullets.remove_if([](const std::unique_ptr<Bullet>& bullet) { 

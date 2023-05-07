@@ -28,4 +28,6 @@ private:
 	Input* input_ = nullptr;
 
 	std::list<std::unique_ptr<Bullet>> bullets;
+
+	float rotateY_;
 };
