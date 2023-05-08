@@ -4,7 +4,8 @@
 #include "AxisIndicator.h"
 
 GameScene::GameScene() :
-	playerTextureHandle_(0u)
+	playerTextureHandle_(0u),
+	enemyTextureHandle_(0)
 {}
 
 GameScene::~GameScene() {}
@@ -32,6 +33,8 @@ void GameScene::Initialize() {
 	enemy_ = std::make_unique<Enemy>();
 
 	enemy_->Initialize(model_, enemyTextureHandle_);
+
+	enemy_->setPlayerPtr(player_.get());
 
 	debugCamera_ = std::make_unique<DebugCamera>(1280,720);
 }

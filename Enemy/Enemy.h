@@ -42,4 +42,9 @@ private:
 	std::chrono::steady_clock::time_point start_;
 
 	static const std::chrono::milliseconds kLifeTime;
+
+	class Player* player_;
+
+public:
+	void setPlayerPtr(Player* player);
 };

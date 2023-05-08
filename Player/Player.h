@@ -30,4 +30,7 @@ private:
 	std::list<std::unique_ptr<Bullet>> bullets;
 
 	float rotateY_;
+
+public:
+	inline Vector3 getPos() const { return worldTransform_.translation_; }
 };

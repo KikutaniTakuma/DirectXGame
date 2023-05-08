@@ -74,10 +74,18 @@ Vector3& Vector3::operator*=(const Matrix4x4& mat) {
 	return *this;
 }
 
-float Vector3::Length() {
+float Vector3::Length() const {
 	return sqrtf(powf(x,2.0f)+ powf(y, 2.0f)+ powf(z, 2.0f));
 }
 
 float Vector3::Dot(const Vector3& vec) {
 	return x * vec.x + y * vec.y + z * vec.z;
+}
+
+Vector3 Vector3::Normalize() const {
+	Vector3 tmp = *this;
+
+	tmp *= 1.0f / this->Length();
+
+	return tmp;
 }

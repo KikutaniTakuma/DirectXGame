@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <numbers>
 #include "TextureManager.h"
+#include "Player/Player.h"
 
 const std::chrono::milliseconds Enemy::kLifeTime = std::chrono::milliseconds(2000);
 
@@ -18,12 +19,15 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 
 	phase_ = Enemy::Phase::Approch;
 
+	worldTransform_.translation_.x= 2.0f;
 	worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_.z = 100.0f;
 
 	bulletTextureHandle_ = TextureManager::Load("./Resources/EnemyBullet.png");
 
 	start_ = std::chrono::steady_clock::now();
+
+	player_ = nullptr;
 }
 
 
@@ -86,8 +90,12 @@ void Enemy::Attack() {
 		bullets.push_back(std::make_unique<Bullet>());
 
 		const float kBulletSpd = 0.5f;
-		Vector3 velocity(0.0f, 0.0f, -kBulletSpd);
+		Vector3 velocity = (player_->getPos() - worldTransform_.translation_).Normalize() * kBulletSpd;
 
 		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity, bulletTextureHandle_);
 	}
+}
+
+void Enemy::setPlayerPtr(Player* player) {
+	player_ = player;
 }
