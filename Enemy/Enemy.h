@@ -22,10 +22,12 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 private:
-	inline void Attack() {};
+	void Attack();
 
 private:
 	uint32_t textureHandle_;
+
+	uint32_t bulletTextureHandle_;
 
 	std::shared_ptr<Model> model_;
 
@@ -36,4 +38,8 @@ private:
 	std::list<std::unique_ptr<Bullet>> bullets;
 
 	Phase phase_;
+
+	std::chrono::steady_clock::time_point start_;
+
+	static const std::chrono::milliseconds kLifeTime;
 };

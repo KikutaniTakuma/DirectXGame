@@ -3,6 +3,9 @@
 #include "Vector3.h"
 #include <algorithm>
 #include <numbers>
+#include "TextureManager.h"
+
+const std::chrono::milliseconds Enemy::kLifeTime = std::chrono::milliseconds(2000);
 
 void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	assert(model);
@@ -17,17 +20,23 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 
 	worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_.z = 100.0f;
+
+	bulletTextureHandle_ = TextureManager::Load("./Resources/EnemyBullet.png");
+
+	start_ = std::chrono::steady_clock::now();
 }
+
 
 void Enemy::Update() {
 	Vector3 move = { 0.0f,0.0f,0.0f };
-	const float kEnemyApprochSpeed = 0.5f;
+	const float kEnemyApprochSpeed = 0.2f;
 	const float kEnemyLeaveSpeed = kEnemyApprochSpeed / std::numbers::sqrt2_v<float>;
 
 	switch (phase_)
 	{
 	case Enemy::Phase::Approch:
 	default:
+		Attack();
 
 		move.z = -kEnemyApprochSpeed;
 
@@ -48,6 +57,14 @@ void Enemy::Update() {
 		break;
 	}
 
+	for (auto& bullet : bullets) {
+		bullet->Update();
+	}
+
+	bullets.remove_if([](const std::unique_ptr<Bullet>& bullet) {
+		return bullet->getIsDead();
+		});
+
 	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.TransferMatrix();
@@ -58,5 +75,19 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 
 	for (auto& bullet : bullets) {
 		bullet->Draw(viewProjection);
+	}
+}
+
+void Enemy::Attack() {
+	auto end = std::chrono::steady_clock::now();
+
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime) {
+		start_ = std::chrono::steady_clock::now();
+		bullets.push_back(std::make_unique<Bullet>());
+
+		const float kBulletSpd = 0.5f;
+		Vector3 velocity(0.0f, 0.0f, -kBulletSpd);
+
+		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity, bulletTextureHandle_);
 	}
 }

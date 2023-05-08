@@ -18,6 +18,19 @@ void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const 
 	start_ = std::chrono::steady_clock::now();
 }
 
+void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity, uint32_t textureHandle) {
+	assert(model);
+
+	textureHandle_ = textureHandle;
+	model_ = model;
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = pos;
+	velocity_ = velocity;
+
+	isDead_ = false;
+	start_ = std::chrono::steady_clock::now();
+}
+
 void Bullet::Update() {
 	auto end = std::chrono::steady_clock::now();
 

@@ -9,6 +9,7 @@ class Bullet
 {
 public:
 	void Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity);
+	void Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity, uint32_t textureHandle);
 
 	void Update();
 
