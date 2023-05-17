@@ -64,7 +64,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// メインループ
 	while (true) {
 		// メッセージ処理
-		if (win->ProcessMessage()) {
+		if (win->ProcessMessage() || input->PushKey(DIK_ESCAPE)) {
 			break;
 		}
 

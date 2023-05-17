@@ -52,7 +52,7 @@ void Player::Update() {
 	worldTransform_.translation_.x = std::clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);
 	worldTransform_.translation_.y = std::clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.matWorld_ = MakeMatrixAffin(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.TransferMatrix();
 
@@ -61,7 +61,7 @@ void Player::Update() {
 	ImGui::End();
 }
 
-void Player::Draw(ViewProjection& viewProjection) { 
+void Player::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
 	for (auto& bullet : bullets) {

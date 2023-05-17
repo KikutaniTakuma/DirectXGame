@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include "AxisIndicator.h"
+#include <cmath>
 
 GameScene::GameScene() :
 	playerTextureHandle_(0u),
@@ -69,6 +70,8 @@ void GameScene::Update() {
 	else {
 		viewProjection_.UpdateMatrix();
 	}
+
+	Collision();
 }
 
 void GameScene::Draw() {
@@ -118,4 +121,59 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::Collision() {
+	auto CollisionFunc = [](const Vector3& pos1, const Vector3& pos2, const Vector3& size1, const Vector3& size2) {
+		if ((std::powf(pos1.x - pos2.x, 2.0f) + std::powf(pos1.y - pos2.y, 2.0f) + std::powf(pos1.z - pos2.z, 2.0f)) <= std::powf(size1.x + size2.x,2.0f)) {
+			return true;
+		}
+		return false;
+	};
+
+	if (!player_->getBulletList().empty()) {
+		for (auto& playerBullet : player_->getBulletList()) {
+			if (CollisionFunc(enemy_->getPos(), playerBullet->getPos(), enemy_->getSize(), playerBullet->getSize())) {
+				enemy_->OnCollision();
+				playerBullet->OnCollision();
+			}
+
+			for (auto& enemyBullet : enemy_->getBulletList()) {
+				if (CollisionFunc(enemyBullet->getPos(), playerBullet->getPos(), enemyBullet->getSize(), playerBullet->getSize())) {
+					enemyBullet->OnCollision();
+					playerBullet->OnCollision();
+				}
+
+				if (CollisionFunc(player_->getPos(), enemyBullet->getPos(), player_->getSize(), enemyBullet->getSize())) {
+					player_->OnCollision();
+					enemyBullet->OnCollision();
+				}
+			}
+		}
+	}
+	else if(!enemy_->getBulletList().empty()){
+		for (auto& enemyBullet : enemy_->getBulletList()) {
+			if (CollisionFunc(player_->getPos(), enemyBullet->getPos(), player_->getSize(), enemyBullet->getSize())) {
+				player_->OnCollision();
+				enemyBullet->OnCollision();
+			}
+
+			for (auto& playerBullet : player_->getBulletList()) {
+				if (CollisionFunc(enemyBullet->getPos(), playerBullet->getPos(), enemyBullet->getSize(), playerBullet->getSize())) {
+					enemyBullet->OnCollision();
+					playerBullet->OnCollision();
+				}
+
+				if (CollisionFunc(enemy_->getPos(), playerBullet->getPos(), enemy_->getSize(), playerBullet->getSize())) {
+					enemy_->OnCollision();
+					playerBullet->OnCollision();
+				}
+			}
+		}
+	}
+
+	if (CollisionFunc(enemy_->getPos(), player_->getPos(), enemy_->getSize(), player_->getSize())) {
+		player_->OnCollision();
+		enemy_->OnCollision();
+	}
 }

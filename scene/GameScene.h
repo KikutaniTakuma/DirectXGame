@@ -74,4 +74,7 @@ private:
 
 	// debugCamera有効化フラグ
 	bool isDebugCameraActive_ = false;
+
+private:
+	void Collision();
 };

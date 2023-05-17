@@ -8,7 +8,7 @@ static const int kColumnWidth = 60;
 
 class Vector3;
 
-class Matrix4x4 {
+class Matrix4x4 final {
 public:
 	/// <summary>
 	/// 規定コンストラクタ

@@ -15,12 +15,12 @@ Vector3::Vector3(float x, float y, float z) {
 	this->z = z;
 }
 
-Vector3 Vector3::operator+(const Vector3& vec) {
+Vector3 Vector3::operator+(const Vector3& vec) const {
 	Vector3 tmp(x + vec.x, y + vec.y, z + vec.z);
 
 	return tmp;
 }
-Vector3 Vector3::operator-(const Vector3& vec) {
+Vector3 Vector3::operator-(const Vector3& vec) const {
 	Vector3 tmp(x - vec.x, y - vec.y, z - vec.z);
 
 	return tmp;

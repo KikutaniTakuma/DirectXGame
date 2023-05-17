@@ -1,13 +1,11 @@
 #pragma once
 
-#include "WorldTransform.h"
-#include "Model.h"
-#include <memory>
 #include <Input.h>
 #include "Bullet/Bullet.h"
 #include <list>
+#include "Object/Object.h"
 
-class Enemy {
+class Enemy : public Object {
 private:
 	enum class Phase {
 		Approch,
@@ -19,19 +17,13 @@ public:
 
 	void Update();
 
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection);
 
 private:
 	void Attack();
 
 private:
-	uint32_t textureHandle_;
-
 	uint32_t bulletTextureHandle_;
-
-	std::shared_ptr<Model> model_;
-
-	WorldTransform worldTransform_;
 
 	Input* input_ = nullptr;
 
@@ -41,10 +33,15 @@ private:
 
 	std::chrono::steady_clock::time_point start_;
 
-	static const std::chrono::milliseconds kLifeTime;
+	static const std::chrono::milliseconds kLifeTime_;
 
 	class Player* player_;
 
 public:
 	void setPlayerPtr(Player* player);
+
+public:
+	const std::list<std::unique_ptr<Bullet>>& getBulletList() const { return bullets; }
+
+
 };

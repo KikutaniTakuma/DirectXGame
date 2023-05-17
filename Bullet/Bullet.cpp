@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "Vector3.h"
 
-const std::chrono::milliseconds Bullet::kLifeTime = std::chrono::milliseconds(5000);
+const std::chrono::milliseconds Bullet::kLifeTime_ = std::chrono::milliseconds(5000);
 
 void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const Vector3& velocity) {
 	assert(model);
@@ -34,7 +34,7 @@ void Bullet::Initialize(std::shared_ptr<Model> model, const Vector3& pos, const 
 void Bullet::Update() {
 	auto end = std::chrono::steady_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime) {
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime_) {
 		isDead_ = true;
 	}
 
@@ -48,7 +48,7 @@ void Bullet::Update() {
 	}
 }
 
-void Bullet::Draw(ViewProjection& viewProjection) {
+void Bullet::Draw(const ViewProjection& viewProjection) {
 	if (!isDead_) {
 		model_->Draw(worldTransform_, viewProjection, textureHandle_);
 	}

@@ -3,7 +3,7 @@
 
 class Matrix4x4;
 
-class Vector3 {
+class Vector3 final {
 public:
 	Vector3();
 	Vector3(float x, float y, float z);
@@ -16,8 +16,8 @@ public:
 
 public:
 	Vector3& operator=(const Vector3& vec) = default;
-	Vector3 operator+(const Vector3& vec);
-	Vector3 operator-(const Vector3& vec);
+	Vector3 operator+(const Vector3& vec) const;
+	Vector3 operator-(const Vector3& vec) const;
 	Vector3 operator+=(const Vector3& vec);
 	Vector3 operator-=(const Vector3& vec);
 	Vector3 operator*(float scalar);

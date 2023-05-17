@@ -6,7 +6,7 @@
 #include "TextureManager.h"
 #include "Player/Player.h"
 
-const std::chrono::milliseconds Enemy::kLifeTime = std::chrono::milliseconds(2000);
+const std::chrono::milliseconds Enemy::kLifeTime_ = std::chrono::milliseconds(2000);
 
 void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	assert(model);
@@ -33,7 +33,7 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 
 void Enemy::Update() {
 	Vector3 move = { 0.0f,0.0f,0.0f };
-	const float kEnemyApprochSpeed = 0.2f;
+	const float kEnemyApprochSpeed = 0.0f;
 	const float kEnemyLeaveSpeed = kEnemyApprochSpeed / std::numbers::sqrt2_v<float>;
 
 	switch (phase_)
@@ -69,12 +69,12 @@ void Enemy::Update() {
 		return bullet->getIsDead();
 		});
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.matWorld_ = MakeMatrixAffin(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.TransferMatrix();
 }
 
-void Enemy::Draw(ViewProjection& viewProjection) {
+void Enemy::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
 	for (auto& bullet : bullets) {
@@ -85,7 +85,7 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 void Enemy::Attack() {
 	auto end = std::chrono::steady_clock::now();
 
-	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime) {
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime_) {
 		start_ = std::chrono::steady_clock::now();
 		bullets.push_back(std::make_unique<Bullet>());
 
