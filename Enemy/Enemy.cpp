@@ -33,7 +33,7 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 
 void Enemy::Update() {
 	Vector3 move = { 0.0f,0.0f,0.0f };
-	const float kEnemyApprochSpeed = 0.0f;
+	const float kEnemyApprochSpeed = 0.2f;
 	const float kEnemyLeaveSpeed = kEnemyApprochSpeed / std::numbers::sqrt2_v<float>;
 
 	switch (phase_)
