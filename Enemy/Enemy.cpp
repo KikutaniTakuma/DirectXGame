@@ -69,9 +69,7 @@ void Enemy::Update() {
 		return bullet->getIsDead();
 		});
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-
-	worldTransform_.TransferMatrix();
+	worldTransform_.UpdateMatrix();
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {

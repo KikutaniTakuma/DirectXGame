@@ -64,6 +64,15 @@
     <Filter Include="Object">
       <UniqueIdentifier>{8ca53561-f23f-49c7-8538-a83ffed74013}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Skydome">
+      <UniqueIdentifier>{ca0b8609-6b87-4b8f-a0d2-738b9c501453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RailCamera">
+      <UniqueIdentifier>{44b5f8aa-5063-46c3-b8b3-f849e7b93c9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\3d">
+      <UniqueIdentifier>{9722fd53-2528-4470-a031-80c85ffb2b41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,6 +104,15 @@
     </ClCompile>
     <ClCompile Include="math\Vector3.cpp">
       <Filter>ソース ファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Skydome\Skydome.cpp">
+      <Filter>Skydome</Filter>
+    </ClCompile>
+    <ClCompile Include="RailCamera\RailCamera.cpp">
+      <Filter>RailCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\WorldTransForm.cpp">
+      <Filter>ソース ファイル\3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +211,12 @@
     </ClInclude>
     <ClInclude Include="Object\Object.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Skydome\Skydome.h">
+      <Filter>Skydome</Filter>
+    </ClInclude>
+    <ClInclude Include="RailCamera\RailCamera.h">
+      <Filter>RailCamera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

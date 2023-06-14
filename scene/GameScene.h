@@ -10,9 +10,11 @@
 #include "WorldTransform.h"
 #include <memory>
 #include "DebugCamera.h"
+#include "RailCamera/RailCamera.h"
 
 #include "Player/Player.h"
 #include "Enemy/Enemy.h"
+#include "Skydome/Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -72,9 +74,18 @@ private:
 
 	std::unique_ptr<DebugCamera> debugCamera_;
 
+	std::unique_ptr<Skydome> skydome_;
+
+	std::unique_ptr<RailCamera> railCamera_;
+
 	// debugCamera有効化フラグ
 	bool isDebugCameraActive_ = false;
 
+	// enemyBullet
+	std::list<std::unique_ptr<Bullet>> enemyBullets;
+
 private:
 	void Collision();
+
+	void AddBullet(const std::unique_ptr<Bullet>& bullet);
 };

@@ -6,7 +6,8 @@
 
 GameScene::GameScene() :
 	playerTextureHandle_(0u),
-	enemyTextureHandle_(0)
+	enemyTextureHandle_(0),
+	enemyBullets(0)
 {}
 
 GameScene::~GameScene() {}
@@ -27,30 +28,36 @@ void GameScene::Initialize() {
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
 
+	debugCamera_ = std::make_unique<DebugCamera>(1280,720);
+
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initalize();
+
+	railCamera_ = std::make_unique<RailCamera>();
+	railCamera_->Initalize(viewProjection_.translation_, viewProjection_.rotation_);
+
 	player_ = std::make_unique<Player>();
 
-	player_->Initialize(model_, playerTextureHandle_);
+	player_->setParent(&railCamera_->getWorldTransform());
+
+	Vector3 playerPosition(0.0f,0.0f,20.0f);
+	player_->Initialize(model_, playerTextureHandle_,playerPosition);
+
 
 	enemy_ = std::make_unique<Enemy>();
+
+	enemy_->setGameScene(this);
 
 	enemy_->Initialize(model_, enemyTextureHandle_);
 
 	enemy_->setPlayerPtr(player_.get());
-
-	debugCamera_ = std::make_unique<DebugCamera>(1280,720);
 }
 
 void GameScene::Update() {
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F3)) {
-		if (!isDebugCameraActive_) {
-			isDebugCameraActive_ = true;
-			AxisIndicator::GetInstance()->SetVisible(true);
-		}
-		else if (isDebugCameraActive_) {
-			isDebugCameraActive_ = false;
-			AxisIndicator::GetInstance()->SetVisible(false);
-		}
+		isDebugCameraActive_ = !isDebugCameraActive_;
+		AxisIndicator::GetInstance()->SetVisible(isDebugCameraActive_);
 	}
 
 #endif
@@ -59,7 +66,11 @@ void GameScene::Update() {
 
 	enemy_->Update();
 
-	if (debugCamera_) {
+	for(ene)
+
+	railCamera_->Update();
+
+	if (isDebugCameraActive_) {
 		debugCamera_->Update();
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
@@ -68,8 +79,12 @@ void GameScene::Update() {
 		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
 	else {
-		viewProjection_.UpdateMatrix();
+		viewProjection_.matView = railCamera_->getViewProjection().matView;
+		viewProjection_.matProjection = railCamera_->getViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 	}
+
+	skydome_->Update();
 
 	Collision();
 }
@@ -100,6 +115,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	skydome_->Draw(viewProjection_);
+	
 	player_->Draw(viewProjection_);
 
 	enemy_->Draw(viewProjection_);
@@ -176,4 +193,8 @@ void GameScene::Collision() {
 		player_->OnCollision();
 		enemy_->OnCollision();
 	}
+}
+
+void GameScene::AddBullet(const std::unique_ptr<Bullet>& bullet) {
+	enemyBullets.push_back(bullet);
 }

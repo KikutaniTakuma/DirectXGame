@@ -5,12 +5,13 @@
 #include <algorithm>
 #include <numbers>
 
-void Player::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) { 
+void Player::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle, const Vector3& pos) {
 	assert(model);
 
 	textureHandle_ = textureHandle;
 	model_ = model;
 	worldTransform_.Initialize();
+	worldTransform_.translation_ = pos;
 	input_ = Input::GetInstance();
 	bullets.resize(0);
 
@@ -52,9 +53,7 @@ void Player::Update() {
 	worldTransform_.translation_.x = std::clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);
 	worldTransform_.translation_.y = std::clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
 
-	worldTransform_.matWorld_ = MakeMatrixAffin(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-
-	worldTransform_.TransferMatrix();
+	worldTransform_.UpdateMatrix();
 
 	ImGui::Begin("Player Position");
 	ImGui::Text("x : %.02f, y : %.02f, z : %.02f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
@@ -76,9 +75,9 @@ void Player::Attack() {
 		const float kBulletSpd = 1.0f;
 		Vector3 velocity(0.0f, 0.0f, kBulletSpd);
 
-		velocity *= MakeMatrixRotateY(worldTransform_.rotation_.y);
+		velocity *= MakeMatrixRotateY(worldTransform_.parent_->rotation_.y);
 
-		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity);
+		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_ * worldTransform_.parent_->matWorld_, velocity);
 	}
 
 

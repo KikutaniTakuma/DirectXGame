@@ -7,7 +7,7 @@
 
 class Player final : public Object{ 
 public:
-	void Initialize(std::shared_ptr<Model> model, uint32_t textureHandle);
+	void Initialize(std::shared_ptr<Model> model, uint32_t textureHandle, const Vector3& pos);
 
 	void Update();
 
@@ -25,4 +25,8 @@ private:
 
 public:
 	const std::list<std::unique_ptr<Bullet>>& getBulletList() const { return bullets; }
+
+	inline void setParent(const WorldTransform* parent) {
+		worldTransform_.parent_ = parent;
+	}
 };

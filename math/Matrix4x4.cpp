@@ -2,17 +2,28 @@
 #include "Vector3.h"
 #include <cmath>
 #include <algorithm>
+#include <cassert>
 
 
 Matrix4x4::Matrix4x4()
-	:m({ 0.0f })
+	:m()
 {}
 
 Matrix4x4::Matrix4x4(const Matrix4x4& mat) {
 	*this = mat;
 }
 
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4& mat) const{
+Matrix4x4::Matrix4x4(const std::array<std::array<float, 4>, 4>& num) {
+	m = num;
+}
+
+Matrix4x4& Matrix4x4::operator=(const Matrix4x4& mat) {
+	std::copy(mat.m.begin(), mat.m.end(), m.begin());
+
+	return *this;
+}
+
+Matrix4x4 Matrix4x4::operator*(const Matrix4x4& mat) const {
 	Matrix4x4 tmp;
 
 	for (int y = 0; y < Matrix4x4::HEIGHT; y++) {
@@ -26,20 +37,25 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4& mat) const{
 	return tmp;
 }
 
-Matrix4x4::Matrix4x4(std::array<std::array<float, 4>, 4> num) {
-	m = num;
-}
-
-const Matrix4x4& Matrix4x4::operator=(const Matrix4x4& mat) {
-	this->m = mat.m;
-
-	return *this;
-}
-
-const Matrix4x4& Matrix4x4::operator*=(const Matrix4x4& mat) {
+Matrix4x4& Matrix4x4::operator*=(const Matrix4x4& mat) {
 	*this = *this * mat;
 
 	return *this;
+}
+
+Vector3 Matrix4x4::operator*(const Vector3& vec) const {
+	Vector3 result;
+
+	result.x = vec.x * m[0][0] + vec.y * m[0][1] + vec.z * m[0][2] + 1.0f * m[0][3];
+	result.y = vec.x * m[1][0] + vec.y * m[1][1] + vec.z * m[1][2] + 1.0f * m[1][3];
+	result.z = vec.x * m[2][0] + vec.y * m[2][1] + vec.z * m[2][2] + 1.0f * m[2][3];
+	float w = vec.x * m[3][0] + vec.y * m[3][1] + vec.z * m[3][2] + 1.0f * m[3][3];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+
+	return result;
 }
 
 Matrix4x4 Matrix4x4::operator+(const Matrix4x4& mat) const {
@@ -53,7 +69,7 @@ Matrix4x4 Matrix4x4::operator+(const Matrix4x4& mat) const {
 
 	return tmp;
 }
-const Matrix4x4& Matrix4x4::operator+=(const Matrix4x4& mat) {
+Matrix4x4& Matrix4x4::operator+=(const Matrix4x4& mat) {
 	for (int y = 0; y < Matrix4x4::HEIGHT; y++) {
 		for (int x = 0; x < Matrix4x4::WIDTH; x++) {
 			this->m[y][x] += mat.m[y][x];
@@ -73,7 +89,7 @@ Matrix4x4 Matrix4x4::operator-(const Matrix4x4& mat) const {
 
 	return tmp;
 }
-const Matrix4x4& Matrix4x4::operator-=(const Matrix4x4& mat) {
+Matrix4x4& Matrix4x4::operator-=(const Matrix4x4& mat) {
 	for (int y = 0; y < Matrix4x4::HEIGHT; y++) {
 		for (int x = 0; x < Matrix4x4::WIDTH; x++) {
 			this->m[y][x] -= mat.m[y][x];
@@ -170,8 +186,18 @@ void Matrix4x4::Affin(const Vector3& scale, const Vector3& rad, const Vector3& t
 		});
 }
 
+void Matrix4x4::Affin(const Vector3& scale, const Matrix4x4& rotate, const Vector3& translate) {
+	*this = Matrix4x4({
+	scale.x * rotate.m[0][0], scale.x * rotate.m[0][1],scale.x * rotate.m[0][2], 0.0f,
+	scale.y * rotate.m[1][0], scale.y * rotate.m[1][1],scale.y * rotate.m[1][2], 0.0f,
+	scale.z * rotate.m[2][0], scale.z * rotate.m[2][1],scale.z * rotate.m[2][2], 0.0f,
+	translate.x, translate.y, translate.z, 1.0f
+		});
+}
+
 
 void Matrix4x4::Inverse() {
+
 	//一時保存用
 	Matrix4x4 tmp = *this;
 
@@ -191,12 +217,12 @@ void Matrix4x4::Inverse() {
 			// 行要素番号バッファ
 			int pibIndex = i;
 			// ピボットバッファ
-			float pibot = fabsf(tmp.m[i][i]);
+			float pibot = std::abs(tmp.m[i][i]);
 
 			// ピボット設定
 			for (int y = i + 1; y < Matrix4x4::HEIGHT; y++) {
-				if (tmp.m[y][i] != 0.0f && pibot < fabsf(tmp.m[y][i])) {
-					pibot = fabsf(tmp.m[y][i]);
+				if (tmp.m[y][i] != 0.0f && pibot < std::abs(tmp.m[y][i])) {
+					pibot = std::abs(tmp.m[y][i]);
 					pibIndex = y;
 				}
 			}
@@ -252,6 +278,42 @@ void Matrix4x4::Transepose() {
 	std::swap(m[2][1], m[1][2]);
 	std::swap(m[2][3], m[3][2]);
 	std::swap(m[3][1], m[1][3]);
+}
+
+void Matrix4x4::PerspectiveFov(float fovY, float aspectRatio, float nearClip, float farClip) {
+	m = { 0.0f };
+
+	m[0][0] = (1.0f / aspectRatio) * (1.0f / std::tan(fovY / 2.0f));
+	m[1][1] = 1.0f / std::tan(fovY / 2.0f);
+	m[2][2] = farClip / (farClip - nearClip);
+	m[2][3] = 1.0f;
+	m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+}
+
+void Matrix4x4::Orthographic(float left, float top, float right, float bottom, float nearClip, float farClip) {
+	m = { 0.0f };
+
+	m[0][0] = 2.0f / (right - left);
+	m[1][1] = 2.0f / (top - bottom);
+	m[2][2] = 1.0f / (farClip - nearClip);
+	m[3][3] = 1.0f;
+
+	m[3][0] = (left + right) / (left - right);
+	m[3][1] = (top + bottom) / (bottom - top);
+	m[3][2] = nearClip / (nearClip - farClip);
+}
+
+void Matrix4x4::ViewPort(float left, float top, float width, float height, float minDepth, float maxDepth) {
+	m = { 0.0f };
+
+	m[0][0] = width / 2.0f;
+	m[1][1] = height/ -2.0f;
+	m[2][2] = maxDepth - minDepth;
+	m[3][3] = 1.0f;
+
+	m[3][0] = left + (width / 2.0f);
+	m[3][1] = top + (height / 2.0f);
+	m[3][2] = minDepth;
 }
 
 
@@ -317,6 +379,30 @@ Matrix4x4 MakeMatrixAffin(const Vector3& scale, const Vector3& rad, const Vector
 	Matrix4x4 tmp;
 
 	tmp.Affin(scale, rad, translate);
+
+	return tmp;
+}
+
+Matrix4x4 MakeMatrixPerspectiveFov(float fovY, float aspectRatio, float nearClip, float farClip) {
+	Matrix4x4 tmp;
+
+	tmp.PerspectiveFov(fovY, aspectRatio, nearClip, farClip);
+
+	return tmp;
+}
+
+Matrix4x4 MakeMatrixOrthographic(float left, float right, float top, float bottom, float nearClip, float farClip) {
+	Matrix4x4 tmp;
+
+	tmp.Orthographic(left, right, top, bottom, nearClip, farClip);
+
+	return tmp;
+}
+
+Matrix4x4 MakeMatrixViewPort(float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 tmp;
+
+	tmp.ViewPort(left, top, width, height, minDepth, maxDepth);
 
 	return tmp;
 }

@@ -41,10 +41,7 @@ void Bullet::Update() {
 	if (!isDead_) {
 		worldTransform_.translation_ += velocity_;
 
-		worldTransform_.matWorld_ =
-		    MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), worldTransform_.translation_);
-
-		worldTransform_.TransferMatrix();
+		worldTransform_.UpdateMatrix();
 	}
 }
 

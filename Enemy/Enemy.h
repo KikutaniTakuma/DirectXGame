@@ -5,6 +5,8 @@
 #include <list>
 #include "Object/Object.h"
 
+class GameScene;
+
 class Enemy : public Object {
 private:
 	enum class Phase {
@@ -37,11 +39,15 @@ private:
 
 	class Player* player_;
 
+	GameScene* gameScene_ = nullptr;
+
 public:
 	void setPlayerPtr(Player* player);
 
 public:
 	const std::list<std::unique_ptr<Bullet>>& getBulletList() const { return bullets; }
 
-
+	inline void setGameScene(GameScene* gameScene) {
+		gameScene_ = gameScene;
+	}
 };
