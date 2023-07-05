@@ -205,5 +205,5 @@ void GameScene::Collision() {
 }
 
 void GameScene::AddBullet(Bullet* bullet) {
-	enemyBullets.push_back(std::move(std::unique_ptr<Bullet>(bullet)));
+	enemyBullets.push_back(std::unique_ptr<Bullet>(bullet));
 }
