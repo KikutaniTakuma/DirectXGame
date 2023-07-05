@@ -29,8 +29,6 @@ private:
 
 	Input* input_ = nullptr;
 
-	std::list<std::unique_ptr<Bullet>> bullets;
-
 	Phase phase_;
 
 	std::chrono::steady_clock::time_point start_;
@@ -45,8 +43,6 @@ public:
 	void setPlayerPtr(Player* player);
 
 public:
-	const std::list<std::unique_ptr<Bullet>>& getBulletList() const { return bullets; }
-
 	inline void setGameScene(GameScene* gameScene) {
 		gameScene_ = gameScene;
 	}

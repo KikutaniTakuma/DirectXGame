@@ -5,6 +5,7 @@
 #include <numbers>
 #include "TextureManager.h"
 #include "Player/Player.h"
+#include "GameScene.h"
 
 const std::chrono::milliseconds Enemy::kLifeTime_ = std::chrono::milliseconds(2000);
 
@@ -15,7 +16,6 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 	model_ = model;
 	worldTransform_.Initialize();
 	input_ = Input::GetInstance();
-	bullets.resize(0);
 
 	phase_ = Enemy::Phase::Approch;
 
@@ -61,23 +61,11 @@ void Enemy::Update() {
 		break;
 	}
 
-	for (auto& bullet : bullets) {
-		bullet->Update();
-	}
-
-	bullets.remove_if([](const std::unique_ptr<Bullet>& bullet) {
-		return bullet->getIsDead();
-		});
-
 	worldTransform_.UpdateMatrix();
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
-	for (auto& bullet : bullets) {
-		bullet->Draw(viewProjection);
-	}
 }
 
 void Enemy::Attack() {
@@ -85,12 +73,14 @@ void Enemy::Attack() {
 
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start_) >= kLifeTime_) {
 		start_ = std::chrono::steady_clock::now();
-		bullets.push_back(std::make_unique<Bullet>());
+		auto bullet = new Bullet();
 
 		const float kBulletSpd = 0.5f;
 		Vector3 velocity = (player_->getPos() - worldTransform_.translation_).Normalize() * kBulletSpd;
 
-		(*bullets.rbegin())->Initialize(model_, worldTransform_.translation_, velocity, bulletTextureHandle_);
+		bullet->Initialize(model_, worldTransform_.translation_, velocity, bulletTextureHandle_);
+
+		gameScene_->AddBullet(bullet);
 	}
 }
 

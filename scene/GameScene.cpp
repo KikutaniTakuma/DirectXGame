@@ -62,11 +62,16 @@ void GameScene::Update() {
 
 #endif
 
-	player_->Update();
-
 	enemy_->Update();
 
-	for(ene)
+	for (auto& i : enemyBullets) {
+		i->Update();
+	}
+	enemyBullets.remove_if([](const std::unique_ptr<Bullet>& bullet) {
+		return bullet->getIsDead();
+		});
+
+	player_->Update();
 
 	railCamera_->Update();
 
@@ -86,7 +91,7 @@ void GameScene::Update() {
 
 	skydome_->Update();
 
-	Collision();
+	//Collision();
 }
 
 void GameScene::Draw() {
@@ -120,6 +125,10 @@ void GameScene::Draw() {
 	player_->Draw(viewProjection_);
 
 	enemy_->Draw(viewProjection_);
+
+	for (auto& i : enemyBullets) {
+		i->Draw(viewProjection_);
+	}
 
 
 	// 3Dオブジェクト描画後処理
@@ -155,7 +164,7 @@ void GameScene::Collision() {
 				playerBullet->OnCollision();
 			}
 
-			for (auto& enemyBullet : enemy_->getBulletList()) {
+			for (auto& enemyBullet : enemyBullets) {
 				if (CollisionFunc(enemyBullet->getPos(), playerBullet->getPos(), enemyBullet->getSize(), playerBullet->getSize())) {
 					enemyBullet->OnCollision();
 					playerBullet->OnCollision();
@@ -168,8 +177,8 @@ void GameScene::Collision() {
 			}
 		}
 	}
-	else if(!enemy_->getBulletList().empty()){
-		for (auto& enemyBullet : enemy_->getBulletList()) {
+
+		for (auto& enemyBullet : enemyBullets) {
 			if (CollisionFunc(player_->getPos(), enemyBullet->getPos(), player_->getSize(), enemyBullet->getSize())) {
 				player_->OnCollision();
 				enemyBullet->OnCollision();
@@ -187,7 +196,7 @@ void GameScene::Collision() {
 				}
 			}
 		}
-	}
+	
 
 	if (CollisionFunc(enemy_->getPos(), player_->getPos(), enemy_->getSize(), player_->getSize())) {
 		player_->OnCollision();
@@ -195,6 +204,6 @@ void GameScene::Collision() {
 	}
 }
 
-void GameScene::AddBullet(const std::unique_ptr<Bullet>& bullet) {
-	enemyBullets.push_back(bullet);
+void GameScene::AddBullet(Bullet* bullet) {
+	enemyBullets.push_back(std::move(std::unique_ptr<Bullet>(bullet)));
 }

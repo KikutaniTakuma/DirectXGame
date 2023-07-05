@@ -10,7 +10,7 @@ void RailCamera::Initalize(const Vector3& translation, const Vector3& rotate) {
 }
 
 void RailCamera::Update() {
-	worldTransform_.rotation_.y += std::numbers::pi_v<float> / 360.0f;
+	//worldTransform_.rotation_.y += std::numbers::pi_v<float> / 360.0f;
 
 	worldTransform_.matWorld_ = MakeMatrixAffin(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 

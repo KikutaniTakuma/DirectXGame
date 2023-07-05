@@ -87,5 +87,6 @@ private:
 private:
 	void Collision();
 
-	void AddBullet(const std::unique_ptr<Bullet>& bullet);
+public:
+	void AddBullet(Bullet* bullet);
 };
