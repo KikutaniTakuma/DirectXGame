@@ -91,7 +91,7 @@ void GameScene::Update() {
 
 	skydome_->Update();
 
-	//Collision();
+	Collision();
 }
 
 void GameScene::Draw() {
@@ -150,7 +150,7 @@ void GameScene::Draw() {
 }
 
 void GameScene::Collision() {
-	auto CollisionFunc = [](const Vector3& pos1, const Vector3& pos2, const Vector3& size1, const Vector3& size2) {
+	static auto CollisionFunc = [](const Vector3& pos1, const Vector3& pos2, const Vector3& size1, const Vector3& size2) {
 		if ((std::powf(pos1.x - pos2.x, 2.0f) + std::powf(pos1.y - pos2.y, 2.0f) + std::powf(pos1.z - pos2.z, 2.0f)) <= std::powf(size1.x + size2.x,2.0f)) {
 			return true;
 		}

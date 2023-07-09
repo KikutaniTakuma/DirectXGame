@@ -16,7 +16,15 @@ public:
 	{}
 
 public:
-	inline const Vector3& getPos() const { return worldTransform_.translation_; }
+	inline Vector3 getPos() const {
+		Vector3 worldPos;
+
+		worldPos.x = worldTransform_.matWorld_.get()[3][0];
+		worldPos.y = worldTransform_.matWorld_.get()[3][1];
+		worldPos.z = worldTransform_.matWorld_.get()[3][2];
+
+		return worldPos;
+	}
 
 	inline const Vector3& getSize() const { return worldTransform_.scale_; }
 

@@ -75,7 +75,7 @@ void Enemy::Attack() {
 		start_ = std::chrono::steady_clock::now();
 		auto bullet = new Bullet();
 
-		const float kBulletSpd = 0.5f;
+		const float kBulletSpd = 1.0f;
 		Vector3 velocity = (player_->getPos() - worldTransform_.translation_).Normalize() * kBulletSpd;
 
 		bullet->Initialize(model_, worldTransform_.translation_, velocity, bulletTextureHandle_);
