@@ -15,7 +15,7 @@ private:
 	};
 
 public:
-	void Initialize(std::shared_ptr<Model> model, uint32_t textureHandle);
+	void Initialize(const Vector3& pos, std::shared_ptr<Model> model, uint32_t textureHandle);
 
 	void Update();
 
@@ -38,6 +38,18 @@ private:
 	class Player* player_;
 
 	GameScene* gameScene_ = nullptr;
+
+	std::chrono::milliseconds waitTime_;
+	bool isWait;
+
+public:
+	inline void SetWaitTime(int32_t waitTime) {
+		if (waitTime != 0) {
+			isWait = true;
+		}
+		start_ = std::chrono::steady_clock::now();
+		waitTime_ = std::chrono::milliseconds(waitTime);
+	}
 
 public:
 	void setPlayerPtr(Player* player);

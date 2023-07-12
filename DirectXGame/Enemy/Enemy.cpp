@@ -7,9 +7,9 @@
 #include "Player/Player.h"
 #include "GameScene.h"
 
-const std::chrono::milliseconds Enemy::kLifeTime_ = std::chrono::milliseconds(2000);
+const std::chrono::milliseconds Enemy::kLifeTime_ = std::chrono::milliseconds(1000);
 
-void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
+void Enemy::Initialize(const Vector3& pos, std::shared_ptr<Model> model, uint32_t textureHandle) {
 	assert(model);
 
 	textureHandle_ = textureHandle;
@@ -19,9 +19,7 @@ void Enemy::Initialize(std::shared_ptr<Model> model, uint32_t textureHandle) {
 
 	phase_ = Enemy::Phase::Approch;
 
-	worldTransform_.translation_.x= 2.0f;
-	worldTransform_.translation_.y = 2.0f;
-	worldTransform_.translation_.z = 100.0f;
+	worldTransform_.translation_ = pos;
 
 	bulletTextureHandle_ = TextureManager::Load("./Resources/EnemyBullet.png");
 
@@ -36,29 +34,39 @@ void Enemy::Update() {
 	const float kEnemyApprochSpeed = 0.2f;
 	const float kEnemyLeaveSpeed = kEnemyApprochSpeed / std::numbers::sqrt2_v<float>;
 
-	switch (phase_)
-	{
-	case Enemy::Phase::Approch:
-	default:
-		Attack();
 
-		move.z = -kEnemyApprochSpeed;
 
-		worldTransform_.translation_ += move;
-
-		if (worldTransform_.translation_.z < 0.0f) {
-			phase_ = Enemy::Phase::Leave;
+	if (isWait) {
+		auto nowTime = std::chrono::steady_clock::now();
+		if (nowTime >= start_ + waitTime_) {
+			isWait = false;
 		}
+	}
+	else {
+		switch (phase_)
+		{
+		case Enemy::Phase::Approch:
+		default:
+			Attack();
+
+			move.z = -kEnemyApprochSpeed;
+
+			worldTransform_.translation_ += move;
+
+			if (worldTransform_.translation_.z < 0.0f) {
+				phase_ = Enemy::Phase::Leave;
+			}
 
 
-		break;
-	case Enemy::Phase::Leave:
-		move.z = -kEnemyLeaveSpeed;
-		move.x = -kEnemyLeaveSpeed;
+			break;
+		case Enemy::Phase::Leave:
+			move.z = -kEnemyLeaveSpeed;
+			move.x = -kEnemyLeaveSpeed;
 
-		worldTransform_.translation_ += move;
+			worldTransform_.translation_ += move;
 
-		break;
+			break;
+		}
 	}
 
 	worldTransform_.UpdateMatrix();

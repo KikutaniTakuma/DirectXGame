@@ -3,6 +3,7 @@
 #include <cassert>
 #include "AxisIndicator.h"
 #include <cmath>
+#include <fstream>
 
 GameScene::GameScene() :
 	playerTextureHandle_(0u),
@@ -43,14 +44,7 @@ void GameScene::Initialize() {
 	Vector3 playerPosition(0.0f,0.0f,20.0f);
 	player_->Initialize(model_, playerTextureHandle_,playerPosition);
 
-
-	enemy_ = std::make_unique<Enemy>();
-
-	enemy_->setGameScene(this);
-
-	enemy_->Initialize(model_, enemyTextureHandle_);
-
-	enemy_->setPlayerPtr(player_.get());
+	LoadEnemyPopData();
 }
 
 void GameScene::Update() {
@@ -62,7 +56,10 @@ void GameScene::Update() {
 
 #endif
 
-	enemy_->Update();
+	UpdateEnemyPopCommands();
+	for (auto& i : enemys_) {
+		i->Update();
+	}
 
 	for (auto& i : enemyBullets) {
 		i->Update();
@@ -124,7 +121,9 @@ void GameScene::Draw() {
 	
 	player_->Draw(viewProjection_);
 
-	enemy_->Draw(viewProjection_);
+	for (auto& i : enemys_) {
+		i->Draw(viewProjection_);
+	}
 
 	for (auto& i : enemyBullets) {
 		i->Draw(viewProjection_);
@@ -159,9 +158,11 @@ void GameScene::Collision() {
 
 	if (!player_->getBulletList().empty()) {
 		for (auto& playerBullet : player_->getBulletList()) {
-			if (CollisionFunc(enemy_->getPos(), playerBullet->getPos(), enemy_->getSize(), playerBullet->getSize())) {
-				enemy_->OnCollision();
-				playerBullet->OnCollision();
+			for (auto& enemy : enemys_) {
+				if (CollisionFunc(enemy->getPos(), playerBullet->getPos(), enemy->getSize(), playerBullet->getSize())) {
+					enemy->OnCollision();
+					playerBullet->OnCollision();
+				}
 			}
 
 			for (auto& enemyBullet : enemyBullets) {
@@ -190,20 +191,74 @@ void GameScene::Collision() {
 					playerBullet->OnCollision();
 				}
 
-				if (CollisionFunc(enemy_->getPos(), playerBullet->getPos(), enemy_->getSize(), playerBullet->getSize())) {
-					enemy_->OnCollision();
-					playerBullet->OnCollision();
+				for (auto& enemy : enemys_) {
+					if (CollisionFunc(enemy->getPos(), playerBullet->getPos(), enemy->getSize(), playerBullet->getSize())) {
+						enemy->OnCollision();
+						playerBullet->OnCollision();
+					}
 				}
 			}
 		}
 	
-
-	if (CollisionFunc(enemy_->getPos(), player_->getPos(), enemy_->getSize(), player_->getSize())) {
-		player_->OnCollision();
-		enemy_->OnCollision();
-	}
+		for (auto& enemy : enemys_) {
+			if (CollisionFunc(enemy->getPos(), player_->getPos(), enemy->getSize(), player_->getSize())) {
+				player_->OnCollision();
+				enemy->OnCollision();
+			}
+		}
 }
 
 void GameScene::AddBullet(Bullet* bullet) {
 	enemyBullets.push_back(std::unique_ptr<Bullet>(bullet));
+}
+
+void GameScene::LoadEnemyPopData() {
+	std::ifstream file("enemyPopData.csv");
+	assert(file.is_open());
+
+	enemyPopCommands << file.rdbuf();
+
+	file.close();
+}
+
+void GameScene::UpdateEnemyPopCommands() {
+	std::string line;
+
+	while (std::getline(enemyPopCommands, line)) {
+		std::istringstream lineStream(line);
+
+		std::string word;
+
+		std::getline(lineStream, word, ',');
+		if (word.find("//") == 0) {
+			continue;
+		}
+
+		if (word.find("POP") == 0) {
+			std::getline(lineStream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			std::getline(lineStream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			std::getline(lineStream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			auto enemy = std::make_unique<Enemy>();
+			enemy->Initialize({x,y,z}, model_, enemyTextureHandle_);
+			enemy->setPlayerPtr(player_.get());
+			enemy->setGameScene(this);
+
+			enemys_.push_back(std::move(enemy));
+		}
+		else if (word.find("WAIT") == 0) {
+			std::getline(lineStream, word, ',');
+			int32_t waitTime = atoi(word.c_str());
+
+			for (auto& i : enemys_) {
+				i->SetWaitTime(waitTime);
+			}
+			break;
+		}
+	}
 }

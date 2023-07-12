@@ -15,6 +15,7 @@
 #include "Player/Player.h"
 #include "Enemy/Enemy.h"
 #include "Skydome/Skydome.h"
+#include <sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -70,7 +71,7 @@ private:
 
 	std::unique_ptr<Player> player_;
 
-	std::unique_ptr<Enemy> enemy_;
+	std::list<std::unique_ptr<Enemy>> enemys_;
 
 	std::unique_ptr<DebugCamera> debugCamera_;
 
@@ -84,9 +85,16 @@ private:
 	// enemyBullet
 	std::list<std::unique_ptr<Bullet>> enemyBullets;
 
+	std::stringstream enemyPopCommands;
+
 private:
 	void Collision();
 
 public:
 	void AddBullet(Bullet* bullet);
+
+	void UpdateEnemyPopCommands();
+
+private:
+	void LoadEnemyPopData();
 };
