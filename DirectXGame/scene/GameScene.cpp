@@ -37,6 +37,8 @@ void GameScene::Initialize() {
 	railCamera_ = std::make_unique<RailCamera>();
 	railCamera_->Initalize(viewProjection_.translation_, viewProjection_.rotation_);
 
+	TextureManager::Load("./Resources/Nerai.png");
+
 	player_ = std::make_unique<Player>();
 
 	player_->setParent(&railCamera_->getWorldTransform());
@@ -141,6 +143,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	player_->DrawUI();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
